@@ -25,7 +25,37 @@ const exampleRoomData = require("../data/rooms");
  *  getRoomByDinosaurName(dinosaurs, rooms, "Pterodactyl");
  *  //> "Dinosaur with name 'Pterodactyl' cannot be found."
  */
-function getRoomByDinosaurName(dinosaurs, rooms, dinosaurName) {}
+function getRoomByDinosaurName(dinosaurs, rooms, dinosaurName) {
+  let dinosaurId;
+  // Find dinosaur with the name of 'dinosaurName' 
+  for (let i = 0; i < dinosaurs.length; i++) {
+    if (dinosaurs[i].name === dinosaurName) {
+      dinosaurId = dinosaurs[i].dinosaurId;
+      break;
+    }
+  }
+
+  // No dinosaur found
+  if (!dinosaurId) {
+    return "Dinosaur with name '" + dinosaurName + "' cannot be found.";
+  }
+
+  let roomName
+
+  // Get room where the dinosaur is found
+  for (let i = 0; i < rooms.length; i++) {
+    if (rooms[i].dinosaurs.includes(dinosaurId)) {
+      roomName = rooms[i].name;
+    }
+  }
+
+  // Dinosaur not found in any room
+  if (!roomName) {
+    return "Dinosaur with name '" + dinosaurName + "' cannot be found in any rooms."
+  }
+
+  return roomName;
+}
 
 /**
  * getConnectedRoomNamesById()
@@ -49,11 +79,67 @@ function getRoomByDinosaurName(dinosaurs, rooms, dinosaurName) {}
       "Kit Hopkins Education Wing"
     ]
  */
-function getConnectedRoomNamesById(rooms, id) {}
+function getConnectedRoomNamesById(rooms, id) {
+  // Check whether room with roomId of 'id' exists
+  let room = isCorrectRoom(rooms, id);
+  if (!room) {
+    return "Room with ID of '" + id + "' could not be found.";
+  }
+
+  // Check whether each connected room is correct
+  for (let i = 0; i < room.connectsTo.length; i++) {
+    if (!isCorrectRoom(rooms, room.connectsTo[i])) {
+      return "Room with ID of '" + room.connectsTo[i] + "' could not be found.";
+    }
+  }
+
+  // Get the name of every connected room
+  let connectedRoomNames = getConnectedRoomNames(rooms, room.connectsTo);
+
+  return connectedRoomNames;
+}
+
+/**
+ * isCorrectRoom()
+ * -----------------
+ * Returns a room object if it exists, where the room object has a roomId corresponding to the value 'id'. Otherwise, it returns a boolean value of 'false'.
+ * 
+ * @param {Object[]} rooms - An array of room objects.
+ * @param {string} id - A unique room identifier.
+ * @returns {Object|boolean} Object if room exists, false otherwise.
+ */
+function isCorrectRoom(rooms, id) {
+  for (let i = 0; i < rooms.length; i++) {
+    if (rooms[i].roomId === id) {
+      // The room exists.
+      return rooms[i];
+    }
+  }
+
+  // Room does not exist.
+  return false;
+}
+/**
+ * getConnectedRoomNames()
+ * -----------------------
+ * Returns am array of strings, where each string is the name of a room whose roomId is provided in the parameter roomIds.
+ * 
+ * @param {Object[]} rooms - An array of room objects.
+ * @param {string[]} roomIds - An array of unique room identifiers.
+ * @returns {string} An array of room names.
+ */
+function getConnectedRoomNames(rooms, roomIds) {
+  let roomNames = [];
+  for (let i = 0; i < rooms.length; i++) {
+    if (roomIds.includes(rooms[i].roomId)) {
+      roomNames.push(rooms[i].name);
+    }
+  }
+
+  return roomNames;
+}
 
 module.exports = {
   getRoomByDinosaurName,
   getConnectedRoomNamesById,
 };
-
-//test
